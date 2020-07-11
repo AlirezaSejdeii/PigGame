@@ -1,0 +1,126 @@
+﻿@page "/"
+<div class="player-0-panel @active[0]">
+    <div class="player-name" id="name-0">@playerName[0]</div>
+    <div class="player-score" id="score-0">@player[0]</div>
+    <div class="player-current-box">
+        <div class="player-current-label">Current</div>
+        <div class="player-current-score" id="current-0">@currentPlayer[0]</div>
+    </div>
+</div>
+
+<div class="player-1-panel @active[1]">
+    <div class="player-name" id="name-1">@playerName[1]</div>
+    <div class="player-score" id="score-1">@player[1]</div>
+    <div class="player-current-box">
+        <div class="player-current-label">Current</div>
+        <div class="player-current-score" id="current-1">@currentPlayer[1]</div>
+    </div>
+</div>
+
+<button class="btn-new" @onclick="newGame"><i class="ion-ios-plus-outline"></i>New game</button>
+@if (isHide == false)
+{
+    <button class="btn-roll" @onclick="roll"><i class="ion-ios-loop"></i>Roll dice</button>
+    <button class="btn-hold" @onclick="hold"><i class="ion-ios-download-outline"></i>Hold</button>
+
+
+    <img src="@imageFile" alt="Dice" class="dice">
+}
+@code {
+    //labels
+    string[] playerName = { "Player 1", "Player 2" };
+
+    bool isHide = false;
+
+    string[] currentPlayer = { "0", "0" };
+    string[] player = { "0", "0" };
+
+    string[] active = { "active", "" };
+
+    string image_dice;
+    string imageFile;
+    int roundScore;
+    int activePlayer;
+
+    protected override void OnInitialized()
+    {
+        //clear labels
+
+        currentPlayer[0] = currentPlayer[1] = "0";
+        player[0] = player[1] = "0";
+        isHide = false;
+        activePlayer = 0;
+        roundScore = 0;
+        image_dice = "5";
+        imageFile = "img/dice-" + image_dice + ".png";
+        Console.WriteLine("start");
+    }
+
+    void newGame()
+    {
+        OnInitialized();
+        Console.WriteLine("new game");
+    }
+    void roll()
+    {
+        Random r = new Random();
+        int dice = r.Next(1, 6);
+
+        image_dice = dice.ToString();
+        imageFile = "img/dice-" + image_dice + ".png";
+
+
+        roundScore += dice;
+        int playerScore = int.Parse(player[activePlayer]);
+        if (dice == 1)
+        {
+            roundScore = 0;
+            hold();
+
+        }
+        else if (playerScore >= 20)
+        {
+            playerName[activePlayer] = "Winnder !";
+            isHide = true;
+        }
+        currentPlayer[activePlayer] = roundScore.ToString();
+
+    }
+    private void hold()
+    {
+        int playerScore = int.Parse(player[activePlayer]);
+        player[activePlayer] = (playerScore + roundScore).ToString();
+        currentPlayer[activePlayer] = "0";
+        changeUser();
+    }
+
+    void changeUser()
+    {
+        int playerScore = int.Parse(player[activePlayer]);
+
+        if (playerScore >= 20)
+        {
+            playerName[activePlayer] = "Winnder !";
+            isHide = true;
+            active[activePlayer] = " winner";
+            return;
+        }
+
+        if (activePlayer == 0)
+        {
+            activePlayer = 1;
+        }
+        else
+        {
+            activePlayer = 0;
+        }
+
+        active[0] = "";
+        active[1] = "";
+        active[activePlayer] = "active";
+        roundScore = 0;
+        currentPlayer[activePlayer] = roundScore.ToString();
+
+
+    }
+}
